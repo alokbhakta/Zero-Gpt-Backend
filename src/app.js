@@ -36,6 +36,11 @@ app.set('trust proxy', 1);
 //     credentials: true,               // allow cookies
 //   }));
 
+
+// Health check route
+app.get("/", (req, res) => {
+  res.json({ message: "✅ Backend server is running!" });
+});
 // using Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat',chatRoutes);
