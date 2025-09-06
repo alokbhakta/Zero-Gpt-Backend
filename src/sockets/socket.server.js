@@ -11,12 +11,26 @@ const {createMemory, queryMemory} = require('../services/vector.service');
 function initSocketServer(httpServer){
 
     const io = new Server(httpServer, {
-        cors: {
-    origin: process.env.FRONTEND_URL, // allow everything
+  cors: {
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const normalized = origin.replace(/\/$/, '');
+      const FRONTEND_ORIGIN = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+      if (normalized === FRONTEND_ORIGIN) return cb(null, true);
+      return cb(new Error(`CORS blocked for socket origin ${origin}`));
+    },
     allowedHeaders: ["Content-Type","Authorization"],
     credentials: true
   }
-    })
+});
+
+//     const io = new Server(httpServer, {
+//         cors: {
+//     origin: process.env.FRONTEND_URL, // allow everything
+//     allowedHeaders: ["Content-Type","Authorization"],
+//     credentials: true
+//   }
+//     })
 
     // Middleware in Socket.io for checking token in valid or not
     io.use(async (socket, next)=>{

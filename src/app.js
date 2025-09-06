@@ -12,10 +12,29 @@ const app = express();
 // using middelwares
 app.use(express.json());
 app.use(cookieParser());
+
+const FRONTEND_ORIGIN = (process.env.FRONTEND_URL || '').replace(/\/$/, ''); // strip trailing slash
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL, // your frontend URL
-    credentials: true,               // allow cookies
-  }));
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // allow non-browser clients
+    const normalized = origin.replace(/\/$/, '');
+    if (normalized === FRONTEND_ORIGIN) {
+      return cb(null, true);
+    }
+    return cb(new Error(`CORS blocked for origin ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.set('trust proxy', 1);
+
+// app.use(cors({
+//     origin: process.env.FRONTEND_URL, // your frontend URL
+//     credentials: true,               // allow cookies
+//   }));
 
 // using Routes
 app.use('/api/auth', authRoutes);

@@ -58,7 +58,13 @@ async function loginUser(req,res) {
 
     const token = jwt.sign({id: user._id},process.env.JWT_SECRET);
 
-    res.cookie("token",token);
+    res.cookie('token', token, {
+  httpOnly: true,
+  secure: true,      // because Render + Vercel = HTTPS
+  sameSite: 'none',  // required for cross-origin
+});
+
+    // res.cookie("token",token);
 
     res.status(200).json({
         message: "User loggedIn Successfully",
