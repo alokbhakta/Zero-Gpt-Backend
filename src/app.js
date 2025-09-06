@@ -5,13 +5,16 @@ var cors = require('cors');
 // routes path
 const authRoutes = require('./routes/auth.routes');
 const chatRoutes = require('./routes/chat.routes');
-const messageRoutes = require('./routes/message.routes')
+const messageRoutes = require('./routes/message.routes');
+const res = require('express/lib/response');
+const morgan = require('morgan');
 
 
 const app = express();
 // using middelwares
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan('dev'))
 
 const FRONTEND_ORIGIN = (process.env.FRONTEND_URL || '').replace(/\/$/, ''); // strip trailing slash
 
@@ -41,6 +44,12 @@ app.set('trust proxy', 1);
 app.get("/", (req, res) => {
   res.json({ message: "✅ Backend server is running!" });
 });
+
+app.get('/health',()=> {
+  res.json({
+    message: 'Server is running properly'
+  })
+})
 // using Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chat',chatRoutes);
