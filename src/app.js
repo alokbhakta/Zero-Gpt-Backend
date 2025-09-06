@@ -45,7 +45,7 @@ app.get("/", (req, res) => {
   res.json({ message: "✅ Backend server is running!" });
 });
 
-app.get('/health',()=> {
+app.get('/health',(req,res)=> {
   res.json({
     message: 'Server is running properly'
   })
